@@ -1,33 +1,33 @@
-const cacheName = "DefaultCompany-GateCrash-1.0";
-const contentToCache = [
-    "Build/WebBuild.loader.js",
-    "Build/WebBuild.framework.js.unityweb",
-    "Build/WebBuild.data.unityweb",
-    "Build/WebBuild.wasm.unityweb",
-    "TemplateData/style.css"
+// GateCrash service worker: network first, cache as an offline fallback.
+// Online, every file comes fresh from the server, so new builds show up straight away.
+// Offline, the last copies that loaded are used, so the game still opens.
+const CACHE_NAME = "gatecrash-cache-v2";
 
-];
-
-self.addEventListener('install', function (e) {
-    console.log('[Service Worker] Install');
-    
-    e.waitUntil((async function () {
-      const cache = await caches.open(cacheName);
-      console.log('[Service Worker] Caching all: app shell and content');
-      await cache.addAll(contentToCache);
-    })());
+self.addEventListener("install", (event) => {
+  // Take over from any older service worker immediately.
+  self.skipWaiting();
 });
 
-self.addEventListener('fetch', function (e) {
-    e.respondWith((async function () {
-      let response = await caches.match(e.request);
-      console.log(`[Service Worker] Fetching resource: ${e.request.url}`);
-      if (response) { return response; }
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((names) => Promise.all(names.filter((n) => n !== CACHE_NAME).map((n) => caches.delete(n))))
+      .then(() => self.clients.claim())
+  );
+});
 
-      response = await fetch(e.request);
-      const cache = await caches.open(cacheName);
-      console.log(`[Service Worker] Caching new resource: ${e.request.url}`);
-      cache.put(e.request, response.clone());
-      return response;
-    })());
+self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
+
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        if (response && response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request))
+  );
 });
