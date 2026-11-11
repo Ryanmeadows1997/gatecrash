@@ -7,7 +7,7 @@
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <link rel="manifest" href="manifest.webmanifest">
-      <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
     <!-- GateCrash: phone setup (added by Board Game > Create Phone Web Template) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -35,7 +35,7 @@
         left: env(safe-area-inset-left, 0px) !important;
         right: env(safe-area-inset-right, 0px) !important;
         top: env(safe-area-inset-top, 0px) !important;
-        bottom: env(safe-area-inset-bottom, 0px) !important;
+        bottom: 0 !important;
         width: auto !important;
         height: auto !important;
         transform: none !important;
@@ -141,7 +141,7 @@
         // Mobile device style: fill the whole browser client area with the game canvas:
         var meta = document.createElement('meta');
         meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover';
+        meta.content = 'width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes, viewport-fit=cover';
         document.getElementsByTagName('head')[0].appendChild(meta);
       }
 

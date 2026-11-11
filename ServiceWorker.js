@@ -1,7 +1,7 @@
 // GateCrash service worker: network first, cache as an offline fallback.
 // Online, every file comes fresh from the server, so new builds show up straight away.
 // Offline, the last copies that loaded are used, so the game still opens.
-const CACHE_NAME = "gatecrash-cache-v2";
+const CACHE_NAME = "gatecrash-cache-v3";
 
 self.addEventListener("install", (event) => {
   // Take over from any older service worker immediately.
