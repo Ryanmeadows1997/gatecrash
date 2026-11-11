@@ -49,6 +49,10 @@
         background: #05060f !important;
         touch-action: none;
       }
+      /* Soft fades along the top and bottom edges, so the game never ends in a hard line. */
+      .gc-fade { position: absolute; left: 0; right: 0; pointer-events: none; z-index: 2; }
+      .gc-fade-top { top: 0; height: 24px; background: linear-gradient(#05060f, rgba(5,6,15,0)); }
+      .gc-fade-bottom { bottom: 0; height: 16px; background: linear-gradient(rgba(5,6,15,0), #05060f); }
       #unity-footer, #unity-fullscreen-button, #unity-build-title, #unity-logo-title-footer { display: none !important; }
     </style>
 </head>
@@ -163,6 +167,39 @@
         });
       };
       document.body.appendChild(script);
+    </script>
+      <!-- GateCrash: phone fit (added by Board Game > Create Phone Web Template) -->
+    <script>
+      (function () {
+        // Draw at no more than 2x resolution: iPhones are 3x, which costs a lot of speed for little visible gain.
+        if (typeof config !== "undefined") config.devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+
+        var container = document.getElementById("unity-container");
+        var probe = document.createElement("div");
+        probe.style.cssText = "position:fixed;top:0;left:0;width:0;height:0;visibility:hidden;padding-top:env(safe-area-inset-top,0px)";
+        document.body.appendChild(probe);
+
+        ["top", "bottom"].forEach(function (edge) {
+          var fade = document.createElement("div");
+          fade.className = "gc-fade gc-fade-" + edge;
+          container.appendChild(fade);
+        });
+
+        // Fill from just below the status bar to the very bottom of the screen. iPhone home-screen
+        // apps can report a height that stops short of the bottom, so use the screen's real height there.
+        function fit() {
+          var top = parseFloat(getComputedStyle(probe).paddingTop) || 0;
+          var full = window.innerHeight;
+          var standalone = window.navigator.standalone || window.matchMedia("(display-mode: standalone)").matches;
+          if (standalone && window.innerWidth < window.innerHeight) full = Math.max(full, screen.height);
+          container.style.setProperty("top", top + "px", "important");
+          container.style.setProperty("bottom", "auto", "important");
+          container.style.setProperty("height", (full - top) + "px", "important");
+        }
+        fit();
+        window.addEventListener("resize", fit);
+        window.addEventListener("orientationchange", function () { setTimeout(fit, 300); });
+      })();
     </script>
   </body>
 </html>
